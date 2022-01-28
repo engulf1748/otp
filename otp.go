@@ -1,5 +1,5 @@
-// Package otp is an easy-to-use implementation of RFC 4226 (HOTP) and RFC 6238
-// (TOTP).
+// Package 'otp' is an easy-to-use implementation of RFC 4226 (HOTP) and RFC
+// 6238 (TOTP).
 package otp
 
 import (
@@ -9,7 +9,6 @@ import (
 	"crypto/sha512"
 	"encoding/base32"
 	"hash"
-	"log"
 	"strconv"
 	"time"
 )
@@ -36,17 +35,17 @@ func init() {
 
 // Represents an HOTP parameter-set. SecretKey must be base-32 encoded.
 type HOTPKey struct {
-	SecretKey    string       `json:"secret_key"` // Base-32
+	SecretKey    string       `json:"secret_key"`
 	HashFunction HashFunction `json:"hash_function"`
 	Digits       byte         `json:"digits"`
 	Counter      uint64       `json:"counter"`
 }
 
-// Computes and returns the OTP using HOTP parameters. If the underlying HOTPKey
-// is invalid, the program exits using log.Fatal.
+// Computes and returns an OTP using the HOTP parameter-set. If the receiver
+// HOTPKey is invalid, the program panics.
 func (k *HOTPKey) OTP() string {
 	if !k.Validate() {
-		log.Fatalln("invalid key parameters")
+		panic("invalid HOTPKey")
 	}
 	ctri := k.Counter
 	var ctr [8]byte
@@ -78,9 +77,9 @@ func (k *HOTPKey) Validate() bool {
 }
 
 // Represents a TOTP parameter-set. Like in HOTPKey, SecretKey must be base-32
-// encoded. Even though T0 not a parameter in virtually all other
-// implementations, according to RFC 6238, it is not necessarily always 0. Go's
-// zero-value mechanism works well here.
+// encoded. Even though T0 not a parameter in virtually all implementations,
+// according to RFC 6238, it is not necessarily always 0—which is why it is a
+// parameter here.
 type TOTPKey struct {
 	SecretKey    string       `json:"secret_key"`
 	HashFunction HashFunction `json:"hash_function"`
@@ -89,12 +88,12 @@ type TOTPKey struct {
 	T0           uint64       `json:"t0"`
 }
 
-// Computes and returns the OTP using TOTP parameters. If the underlying TOTPKey
-// is invalid, the program exits using log.Fatal.
+// Computes and returns an OTP using the TOTP parameter-set. If the receiver
+// TOTPKey is invalid, the program panics.
 func (k *TOTPKey) OTP() string {
 	h := k.conv()
 	if !h.Validate() {
-		log.Fatalln("invalid key parameters")
+		panic("invalid TOTPKey")
 	}
 	return h.OTP()
 }

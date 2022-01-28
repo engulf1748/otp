@@ -1,4 +1,4 @@
-# OTP
+# otp
 
 [![Go Reference](https://pkg.go.dev/badge/codeberg.org/ar324/otp.svg)](https://pkg.go.dev/codeberg.org/ar324/otp)
 
