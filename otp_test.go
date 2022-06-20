@@ -4,13 +4,11 @@ import (
 	"testing"
 )
 
-type wrapper struct {
-	HOTPKey
-	expect string
-}
-
 func TestHOTP(t *testing.T) {
-	w := []wrapper{
+	w := []struct {
+		HOTPKey
+		expect string
+	}{
 		{HOTPKey{"GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ", SHA1, 8, 0x0000000000000001}, "94287082"},
 		{HOTPKey{"GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ", SHA1, 8, 0x00000000023523EC}, "07081804"},
 		{HOTPKey{"GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ", SHA1, 8, 0x0000000027BC86AA}, "65353130"},
@@ -24,9 +22,9 @@ func TestHOTP(t *testing.T) {
 	for _, v := range w {
 		otp := v.OTP()
 		if otp != v.expect {
-			t.Fatalf("Mismatch. Want: %s Got: %s", v.expect, otp)
+			t.Errorf("Mismatch on key %+v:\nWant: %s Got: %s", v.HOTPKey, v.expect, otp)
 		} else {
-			t.Logf("Success. Want: %s Got: %s", v.expect, otp)
+			t.Logf("Success on key %+v:\nWant: %s Got: %s", v, v.expect, otp)
 		}
 	}
 }
@@ -39,9 +37,9 @@ func TestValidate(t *testing.T) {
 	}
 	for _, v := range invalid {
 		if v.Validate() {
-			t.Fatalf("Failure. Invalid key marked as valid: %v", v)
+			t.Errorf("Failure: invalid key marked as valid: %+v", v)
 		} else {
-			t.Logf("Success (invalid).")
+			t.Logf("Success: invalid key marked as invalid: %+v", v)
 		}
 	}
 
@@ -52,9 +50,9 @@ func TestValidate(t *testing.T) {
 	}
 	for _, v := range valid {
 		if !v.Validate() {
-			t.Fatalf("Failure. Valid key marked as invalid: %v", v)
+			t.Errorf("Failure: valid key marked as invalid: %+v", v)
 		} else {
-			t.Logf("Success (valid).")
+			t.Logf("Success: valid key marked as valid: %+v", v)
 		}
 	}
 }
